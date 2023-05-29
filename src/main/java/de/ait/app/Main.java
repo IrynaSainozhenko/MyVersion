@@ -16,6 +16,11 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println("Добро пожаловать в приложение разработанное участниками 3 группы");
+        System.out.println("");
+        System.out.println("Для продолжения работы с приложением выберите нужный вариант из списка");
+
+
         Scanner scanner = new Scanner(System.in);
         UsersRepository usersRepository = new UsersRepositoryTextFileImpl("users.txt");
         UsersRepository testUserRepository = new UsersRepositoryListImpl();

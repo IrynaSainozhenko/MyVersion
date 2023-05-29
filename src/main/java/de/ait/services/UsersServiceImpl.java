@@ -39,7 +39,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
 
-//3. Сохранить нового пользователя
+// 3. Сохранить нового пользователя
 
     public User createNewUser(
             String firstNameUser,
@@ -54,12 +54,12 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public double getAverageAgeOfUsers() {
         List<User> users = usersRepository.findAll();
-        double tempSum = 0.0;
+        int usersSum = 0;
         if (users.size() == 0)
-            return 0.0;
+            return 0;
         for (User user : users)
-            tempSum += user.getAge();
-        return tempSum / users.size();
+            usersSum += user.getAge();
+        return usersSum / users.size();
     }
 
 
