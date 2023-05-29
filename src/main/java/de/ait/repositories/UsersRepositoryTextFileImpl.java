@@ -1,99 +1,66 @@
 package de.ait.repositories;
 
 import de.ait.models.User;
+import de.ait.services.UsersServiceImpl;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class UsersRepositoryTextFileImpl implements UsersRepository {
-
     private String fileName;
 
     public UsersRepositoryTextFileImpl(String fileName) {
         this.fileName = fileName;
     }
 
-//    @Override
-//    public List<User> findAll() {
-//        List<User> users = new ArrayList<>(); // делаем список для всех пользователей
-//
-//        FileReader fileReader = null;
-//        BufferedReader bufferedReader = null;
-//        try {
-//            fileReader = new FileReader(fileName); // открываем файл
-//            bufferedReader = new BufferedReader(fileReader); // открываем буферизированный поток для чтения на основе файла
-//
-//            String line = bufferedReader.readLine(); // считываем строку
-//
-//            while (line != null) {  // если строку смогли считать
-//
-//                String[] parsed = line.split("\\|"); // разбиваем строку на составляющие
-//                String firstName = parsed[0]; // из каждого кусочка строки делаем отдельную переменную нужного типа
-//                String lastName = parsed[1];
-//                int age = Integer.parseInt(parsed[2]);
-//                double height = Double.parseDouble(parsed[3]);
-//
-//                User user = new User( // создаем нового пользователя на основе данных из строки
-//                        firstName, lastName, age, height
-//                );
-//                users.add(user); // положили пользователя в список
-//                line = bufferedReader.readLine(); // считали следующую строку
-//            }
-//
-//        } catch (IOException e) {
-//            System.err.println("Произошла ошибка");
-//        } finally { // независимо от того, как сработал код - он будет выполняться в любом случае
-//            try {
-//                if (fileReader != null) {
-//                    fileReader.close();
-//                }
-//            } catch (IOException ignore) {
-//            }
-//            try {
-//                if (bufferedReader != null) {
-//                    bufferedReader.close();
-//                }
-//                
-//            } catch (IOException ignore) {
-//            }
-//        }
-//
-//        return users;
-//    }
-
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList<>(); // делаем список для всех пользователей
+        List<User> users = new ArrayList<>();
 
-        // try-with-resources
-        try (FileReader fileReader = new FileReader(fileName); 
+        try (FileReader fileReader = new FileReader(fileName);
              BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-            String line = bufferedReader.readLine(); // считываем строку
+            String line = bufferedReader.readLine();
 
-            while (line != null) {  // если строку смогли считать
-                User user = parseLine(line); // преобразуем пользователя в строку
-                users.add(user); // положили пользователя в список
-                line = bufferedReader.readLine(); // считали следующую строку
+            while (line != null) {
+                User user = parseLine(line);
+                users.add(user);
+                line = bufferedReader.readLine();
             }
         } catch (IOException e) {
             System.err.println("Произошла ошибка");
         }
-
         return users;
     }
 
+    @Override
+    public void saveNewUser(User user) {
+
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+                new FileWriter(fileName, true))){
+
+            String newUser = user.getFirstName() + "|" +
+                    user.getLastName() + "|" +
+                    user.getAge() + "|" +
+                    user.getHeight();
+            bufferedWriter.write(newUser);
+            bufferedWriter.newLine();
+
+        }catch(IOException e){
+            System.out.println("Произошла ошибка");
+        }
+    }
+
     private static User parseLine(String line) {
-        String[] parsed = line.split("\\|"); // разбиваем строку на составляющие
-        String firstName = parsed[0]; // из каждого кусочка строки делаем отдельную переменную нужного типа
+        String[] parsed = line.split("\\|");
+        String firstName = parsed[0];
         String lastName = parsed[1];
         int age = Integer.parseInt(parsed[2]);
         double height = Double.parseDouble(parsed[3]);
 
-        return new User( // создаем нового пользователя на основе данных из строки
+        return new User(
                 firstName, lastName, age, height
         );
     }

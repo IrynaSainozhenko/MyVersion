@@ -6,68 +6,52 @@ import de.ait.repositories.UsersRepository;
 import java.util.*;
 
 public class UsersServiceImpl implements UsersService {
-
     private UsersRepository usersRepository;
 
     public UsersServiceImpl(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
+
+    // 1. Вывести имена всех пользователей
     @Override
     public List<String> getNames() {
-        List<User> users = usersRepository.findAll(); // получаем всех пользователей
-        List<String> names = new ArrayList<>(); // создаем пустой список имен
+        List<User> users = usersRepository.findAll();
+        List<String> names = new ArrayList<>();
 
-        for (User user : users) { // пробегаемся по всем пользователям
-            names.add(user.getFirstName()); // добавляем имя пользователя в список имен
+        for (User user : users) {
+            names.add(user.getFirstName());
         }
-        // возвращаем имена
         return names;
     }
 
+
+    //    2. Вывести фамилию самого взрослого пользователя
     @Override
     public String getLastNameOfMostAging() {
-        /*
-        Marsel|Sidikov|29|1.85
-        Maxim|Ivanov|25|1.79
-        Ruslan|Kochkin|41|1.83
-        Kirill|Petrov|55|1.90
-
-        29 -> Sidikov
-        25 -> Ivanov
-        41 -> Kochkin
-        55 -> Petrov
-
-        Collections.max(29, 25, 41, 55) -> 55
-
-        return userAge.get(55) -> Petrov
-
-         */
         List<User> users = usersRepository.findAll();
         Map<Integer, String> userAge = new HashMap<>();
-
-        for (User user : users) { // пробегаем по всему списку
-            userAge.put(user.getAge(), user.getLastName()); // добавили пару возраст-фамилия
-        }
-
-        int maxAge = Collections.max(userAge.keySet()); // находим максимальный возраст
-
-        return userAge.get(maxAge); // возвращаем фамилию, которая лежит под максимальным ключом
-    }
-
-    @Override
-    public int getAgeOfTheHighest() {
-        List<User> users = usersRepository.findAll();
-        Map<Double, Integer> userHeight = new HashMap<>();
-
         for (User user : users) {
-            userHeight.put(user.getHeight(), user.getAge());
+            userAge.put(user.getAge(), user.getLastName());
         }
-
-        double maxHeight = Collections.max(userHeight.keySet());
-
-        return userHeight.get(maxHeight);
+        int maxAge = Collections.max(userAge.keySet());
+        return userAge.get(maxAge);
     }
+
+
+//3. Сохранить нового пользователя
+
+    public User createNewUser(
+            String firstNameUser,
+            String lastNameUser,
+            int ageUser,
+            double heightUser){
+        return new User(firstNameUser, lastNameUser, ageUser, heightUser);
+    }
+
+
+    //4. Вывести средний возраст всех пользователей
+    @Override
     public double getAverageAgeOfUsers() {
         List<User> users = usersRepository.findAll();
         double tempSum = 0.0;
@@ -75,6 +59,36 @@ public class UsersServiceImpl implements UsersService {
             return 0.0;
         for (User user : users)
             tempSum += user.getAge();
-        return tempSum/users.size();
+        return tempSum / users.size();
+    }
+
+
+    //5. Вывести возраст самого высокого человека
+    @Override
+    public int getAgeOfTheHighest(){
+        List<User> users = usersRepository.findAll();
+        Map<Double, Integer> userHeight = new HashMap<>();
+        for (User user : users) {
+            userHeight.put(user.getHeight(), user.getAge());
+        }
+        double maxHeight = Collections.max(userHeight.keySet());
+        return userHeight.get(maxHeight);
+    }
+
+
+    //6. Вывести имя и фамилию самого низкого человека
+    @Override
+    public String getShortestPersonFullName() {
+        List<User> users = usersRepository.findAll();
+        if (users.isEmpty()) {
+            return "";
+        }
+        User shortestUser = users.get(0);
+        for (int i = 1; i < users.size(); i++) {
+            if (users.get(i).getHeight() < shortestUser.getHeight()) {
+                shortestUser = users.get(i);
+            }
+        }
+        return shortestUser.getFirstName() + " " + shortestUser.getLastName();
     }
 }
